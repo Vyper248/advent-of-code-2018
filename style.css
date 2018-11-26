@@ -1,0 +1,94 @@
+:root {
+    --textColor: #00cc00;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    background-color: black;
+    color: var(--textColor);
+    text-align: center;
+    font-family: "Source Code Pro", monospace;
+}
+
+h1 {
+    text-align: center;
+    font-size: 5em;
+    font-weight: 100;
+}
+
+h3 {
+    background-color: lightgray;
+    color: black;
+    margin: 0px;
+    padding: 10px;
+}
+
+h4 {
+    margin: 0px;
+    position: relative;
+    top: -2px;
+    color: gold;
+}
+
+.container {
+    max-width: 1440px;
+    display: flex;
+    justify-content: center;
+}
+
+.day {
+    width: 200px;
+    border: 1px solid lightgray;
+    border-radius: 5px;
+    margin: 20px;
+}
+
+.answers {
+    padding: 10px;
+}
+
+.answer {
+    color: white;
+}
+
+.starGroup {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+}
+
+.starGroup * {
+    width: 50%;
+}
+
+.starGroup:first-of-type {
+    border-bottom: 1px solid #555;
+}
+
+a.link {
+    color: white;
+    border: 1px solid black;
+    padding: 10px;
+    border-radius: 5px;
+    text-decoration: none;
+    transition: 0.3s;
+    display: inline-block;
+}
+
+.link:hover {
+    border-color: lightgray;
+    background-color: black;
+    color: var(--textColor);
+}
+
+.day a {
+    border: 1px solid lightgray;
+    padding: 10px;
+    width: 100%;
+    background-color: lightgray;
+    color: black;
+    border-radius: 0px 0px 4px 4px
+}

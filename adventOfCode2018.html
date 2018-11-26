@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+    <head>
+        <meta charset="utf-8">
+        <title></title>
+        <link href="https://fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet">
+        <link type="text/css" rel="stylesheet" href="style.css">
+        <style>
+            
+
+        
+        </style>
+    </head>
+    <body>
+        <h1>Advent of Code 2018</h1>
+        
+        <a class="link" href="">[View all finished days on GitHub]</a>
+                
+        <hr>
+        
+        <div class="container"></div>
+        
+        <template>
+            <div class="day">
+                <h3>Day 1</h3>
+                
+                <div class="answers">
+                    <div class="starGroup">
+                        <h4>&#9733;</h4>
+                        <div class="answer one">
+                        
+                        </div>
+                    </div>
+                    
+                    <div class="starGroup">
+                        <h4>&#9733;&#9733;</h4>
+                        <div class="answer two">
+                        
+                        </div>
+                    </div>
+                </div>
+                
+                <a class="link" href="">[View Code]</a>
+            </div>
+        </template>
+        
+        <script>
+        
+            const days = [
+                {first: 0, second: 0, url: ''},
+                {first: 230, second: 20, url: ''},
+                {first: 250, second: 150, url: ''},
+            ];
+            
+            const container = document.querySelector('.container');
+            const template = document.querySelector('template').content;
+            
+            days.forEach((day,i) => {
+                const dayNode = template.cloneNode(true);
+                
+                dayNode.querySelector('h3').innerText = 'Day '+(i+1);
+                dayNode.querySelector('.answer.one').innerText = day.first;
+                dayNode.querySelector('.answer.two').innerText = day.second;
+                dayNode.querySelector('.link').setAttribute('href', day.url);
+                
+                container.appendChild(dayNode);
+                
+            });
+        
+        </script>
+    </body>
+</html>
