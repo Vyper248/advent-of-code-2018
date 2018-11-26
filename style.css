@@ -36,6 +36,7 @@ h4 {
 .container {
     max-width: 1440px;
     display: flex;
+    flex-wrap: wrap;
     justify-content: center;
 }
 
@@ -44,6 +45,10 @@ h4 {
     border: 1px solid lightgray;
     border-radius: 5px;
     margin: 20px;
+}
+
+.day.empty {
+    opacity: 0.2;
 }
 
 .answers {
@@ -79,9 +84,21 @@ a.link {
 }
 
 .link:hover {
-    border-color: lightgray;
+    border-right-color: black;
+    border-left-color: black;
+    border-bottom-color: black;
     background-color: black;
     color: var(--textColor);
+}
+
+.link.inverted:hover {
+    border-color: lightgray;
+}
+
+.day.empty .link:hover {
+    background-color: lightgray;
+    color: black;
+    cursor: default;
 }
 
 .day a {
@@ -90,5 +107,5 @@ a.link {
     width: 100%;
     background-color: lightgray;
     color: black;
-    border-radius: 0px 0px 4px 4px
+    border-radius: 0px 0px 4px 4px;
 }
