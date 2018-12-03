@@ -49,31 +49,31 @@
         <script>
         
             const days = [
-                {first: 502, second: 71961, url: 'https://github.com/Vyper248/advent-of-code-2018/blob/master/day1.js'},
-                {first: 6150, second: 'rteotyxzbodglnpkudawhijsc', url: 'https://github.com/Vyper248/advent-of-code-2018/blob/master/day2.js'},
-                {first: 0, second: 0, url: ''},
-                {first: 0, second: 0, url: ''},
-                {first: 0, second: 0, url: ''},
-                {first: 0, second: 0, url: ''},
-                {first: 0, second: 0, url: ''},
-                {first: 0, second: 0, url: ''},
-                {first: 0, second: 0, url: ''},
-                {first: 0, second: 0, url: ''},
-                {first: 0, second: 0, url: ''},
-                {first: 0, second: 0, url: ''},
-                {first: 0, second: 0, url: ''},
-                {first: 0, second: 0, url: ''},
-                {first: 0, second: 0, url: ''},
-                {first: 0, second: 0, url: ''},
-                {first: 0, second: 0, url: ''},
-                {first: 0, second: 0, url: ''},
-                {first: 0, second: 0, url: ''},
-                {first: 0, second: 0, url: ''},
-                {first: 0, second: 0, url: ''},
-                {first: 0, second: 0, url: ''},
-                {first: 0, second: 0, url: ''},
-                {first: 0, second: 0, url: ''},
-                {first: 0, second: 0, url: ''},
+                {first: 502, second: 71961},
+                {first: 6150, second: 'rteotyxzbodglnpkudawhijsc'},
+                {first: 96569, second: 1023},
+                {first: 0, second: 0},
+                {first: 0, second: 0},
+                {first: 0, second: 0},
+                {first: 0, second: 0},
+                {first: 0, second: 0},
+                {first: 0, second: 0},
+                {first: 0, second: 0},
+                {first: 0, second: 0},
+                {first: 0, second: 0},
+                {first: 0, second: 0},
+                {first: 0, second: 0},
+                {first: 0, second: 0},
+                {first: 0, second: 0},
+                {first: 0, second: 0},
+                {first: 0, second: 0},
+                {first: 0, second: 0},
+                {first: 0, second: 0},
+                {first: 0, second: 0},
+                {first: 0, second: 0},
+                {first: 0, second: 0},
+                {first: 0, second: 0},
+                {first: 0, second: 0},
             ];
             
             const container = document.querySelector('.container');
@@ -88,7 +88,7 @@
                 dayNode.querySelector('h3').innerText = 'Day '+(i+1);
                 dayNode.querySelector('.answer.one').innerHTML = day.first || '';
                 dayNode.querySelector('.answer.two').innerHTML = day.second || '';
-                dayNode.querySelector('.link').setAttribute('href', day.url);
+                dayNode.querySelector('.link').setAttribute('href', 'https://github.com/Vyper248/advent-of-code-2018/blob/master/day'+(i+1)+'.js');
                 
                 if (day.first === 0 && day.second === 0){
                     dayNode.querySelector('.day').classList.add('empty');
