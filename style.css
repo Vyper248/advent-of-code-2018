@@ -19,6 +19,11 @@ h1 {
     font-weight: 100;
 }
 
+h1 a {
+    color: var(--textColor);
+    text-decoration: none;
+}
+
 h3 {
     background-color: lightgray;
     color: black;
@@ -60,13 +65,43 @@ h4 {
     color: white;
 }
 
+.answer:hover + .popupAnswer {
+    opacity: 1;
+    z-index: 2;
+}
+
+.popupAnswer:hover {
+    opacity: 1;
+    z-index: 2;
+}
+
+.popupAnswer {
+    opacity: 0;
+    position: absolute;
+    left: 130px;
+    top: 0px;
+    border: 1px solid var(--textColor);
+    padding: 10px;
+    border-radius: 10px;
+    background-color: black;
+    z-index: -1;
+    transform: translate(-50%, 0%);
+    transition: 0.3s;
+    color: white;
+}
+
+.popupAnswer.hidden {
+    display: none;
+}
+
 .starGroup {
     display: flex;
     align-items: center;
     padding: 10px;
+    position: relative;
 }
 
-.starGroup * {
+.starGroup > h4, .starGroup > .answer {
     width: 50%;
 }
 

@@ -12,7 +12,7 @@
         </style>
     </head>
     <body>
-        <h1>Advent of Code 2018</h1>
+        <h1><a href="https://adventofcode.com/2018">Advent of Code 2018</a></h1>
         
         <a class="link inverted" href="https://github.com/Vyper248/advent-of-code-2018">[View all finished days on GitHub]</a>
                 
@@ -30,6 +30,7 @@
                         <div class="answer one">
                         
                         </div>
+                        <div class="popupAnswer hidden"></div>
                     </div>
                     
                     <div class="starGroup">
@@ -37,6 +38,7 @@
                         <div class="answer two">
                         
                         </div>
+                        <div class="popupAnswer hidden"></div>
                     </div>
                 </div>
                 
@@ -48,7 +50,7 @@
         
             const days = [
                 {first: 502, second: 71961, url: 'https://github.com/Vyper248/advent-of-code-2018/blob/master/day1.js'},
-                {first: 0, second: 0, url: ''},
+                {first: 6150, second: 'rteotyxzbodglnpkudawhijsc', url: 'https://github.com/Vyper248/advent-of-code-2018/blob/master/day2.js'},
                 {first: 0, second: 0, url: ''},
                 {first: 0, second: 0, url: ''},
                 {first: 0, second: 0, url: ''},
@@ -80,9 +82,12 @@
             days.forEach((day,i) => {
                 const dayNode = template.cloneNode(true);
                 
+                day.first = checkLength(dayNode, day.first, 'one');
+                day.second = checkLength(dayNode, day.second, 'two');
+                
                 dayNode.querySelector('h3').innerText = 'Day '+(i+1);
-                dayNode.querySelector('.answer.one').innerText = day.first || '';
-                dayNode.querySelector('.answer.two').innerText = day.second || '';
+                dayNode.querySelector('.answer.one').innerHTML = day.first || '';
+                dayNode.querySelector('.answer.two').innerHTML = day.second || '';
                 dayNode.querySelector('.link').setAttribute('href', day.url);
                 
                 if (day.first === 0 && day.second === 0){
@@ -91,8 +96,17 @@
                 }
                 
                 container.appendChild(dayNode);
-                
             });
+            
+            function checkLength(dayNode, answer, className){
+                if (answer.toString().length > 7) {
+                    const popup = dayNode.querySelector(`.answer.${className} + .popupAnswer`);
+                    popup.innerHTML = answer;
+                    popup.classList.remove('hidden');
+                    return answer.toString().substr(0,4) + '...';
+                }
+                return answer;
+            }
         
         </script>
     </body>
