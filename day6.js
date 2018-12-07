@@ -11,21 +11,10 @@ const first = (input) => {
     //check all coords in area. Look at distance from all nodes and add to node area if closest
     for (let y = 0; y < maxY; y++){
         for (let x = 0; x < maxX; x++){
-            checkDistances(coords, x, y, true); //true = increment area
+            const closestCoord = checkDistances(coords, x, y, true); //true = increment area
+            if (closestCoord && (x < 2 || x > maxX-2 || y < 2 || y > maxY-2)) closestCoord.infinite = true; //if position is close to edge, that node is infinite
         }
     }
-                
-    //check if infinite so can ignore
-    coords.forEach(coord => {
-        let infinite = false;
-        
-        infinite = checkDirection(coord.x, coord.x+100, coords, coord, true); //right
-        if (!infinite) infinite = checkDirection(coord.x-100, coord.x, coords, coord, true); //left
-        if (!infinite) infinite = checkDirection(coord.y, coord.y+100, coords, coord, false); //down
-        if (!infinite) infinite = checkDirection(coord.y-100, coord.y, coords, coord, false); //up
-        
-        coord.infinite = infinite;
-    });
     
     //get highest area that isn't infinite
     let highest = coords.reduce((a,c) => {
@@ -71,16 +60,6 @@ function checkDistanceSum(coords, x, y, size){
         sum += distance(coord.x, coord.y, x, y);
     });
     return sum;
-}
-
-function checkDirection(start, end, coords, coord, x){
-    for (let i = start; i < end; i++){
-        const closest = x ? checkDistances(coords, i, coord.y) : checkDistances(coords, coord.x, i);
-        if (closest === null || closest !== coord){
-            return false;
-        }
-    }
-    return true;
 }
 
 function checkDistances(coords, x, y, increment = false){
