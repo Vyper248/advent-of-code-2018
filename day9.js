@@ -9,20 +9,21 @@ const runFunctions = () => {
 
 const both = (input, star) => {
     let currentPlayer = 0;
-    let board = [{n:0, prev:0, next:0, i:0}];
-    let currentNode = board[0];
+    let currentNode = {n:0, prev:null, next:null};
+    currentNode.prev = currentNode;
+    currentNode.next = currentNode;
     let {marbles, players} = input;
     let scores = [];
     
     for (let i = 1; i <= marbles; i++){
         if (i % 23 === 0){
             scores[currentPlayer] ? scores[currentPlayer] += i : scores[currentPlayer] = i;
-            currentNode = goBack(currentNode, board, 7);
+            currentNode = goBack(currentNode, 7);
             scores[currentPlayer] += currentNode.n;
-            currentNode = remove(board, currentNode);
+            currentNode = remove(currentNode);
         } else {
-            let nextNode = next(currentNode, board);
-            currentNode = insertAfter(board, nextNode, i);
+            let nextNode = currentNode.next;
+            currentNode = insertAfter(nextNode, i);
         }
         currentPlayer = (currentPlayer+1) % players;
     }
@@ -35,32 +36,22 @@ const both = (input, star) => {
     console.log(star, highScore);
 };
 
-const insertAfter = (board, node, marble) => {
-    let index = board.length;
-    let newNode = {n:marble, prev:node.i, next:node.next, i:index};
-    board.push(newNode);
-    board[node.next].prev = index;
-    node.next = index;
+const insertAfter = (node, marble) => {
+    let newNode = {n:marble, prev:node, next:node.next};
+    node.next.prev = newNode;
+    node.next = newNode;
     return newNode;
 }
 
-const remove =(board, node) => {
-    board[node.prev].next = board[node.next].i;
-    board[node.next].prev = board[node.prev].i;
-    return board[node.next];
+const remove =(node) => {
+    node.prev.next = node.next;
+    node.next.prev = node.prev;
+    return node.next;
 }
 
-const next = (node, board) => {
-    return board[node.next];
-}
-
-const prev = (node, board) => {
-    return board[node.prev];
-}
-
-const goBack = (node, board, n) => {
+const goBack = (node, n) => {
     for (let i = 0; i < n; i++){
-        node = prev(node, board);
+        node = node.prev;
     }
     return node;
 }
