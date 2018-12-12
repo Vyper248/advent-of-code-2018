@@ -7,24 +7,22 @@ const runFunctions = (input) => {
 
 const first = (input) => {   
     let [state, conditions] = getStateAndConditions(input);
-    let center = 0;
-
-    for (let i = 0; i < 20; i++){
-        [state, center] = getNextGeneration(state, conditions, center);
-    }
-
-    let totalPlants = getTotal(state, center);
-    
+    let totalPlants = iterate(state, conditions, 20);
     console.log('First Star: ', totalPlants);
 };
 
 const second = (input) => {
     let [state, conditions] = getStateAndConditions(input);
+    let totalPlants = iterate(state, conditions, 50000000000);
+    console.log('Second Star: ', totalPlants);
+};
+
+const iterate = (state, conditions, amount) => {
     let center = 0;
     let lastTrimmed = state.join('');
-    
-    let stopPoint = 0;
-    for (let i = 0; i < 50000000000; i++){
+    let stopPoint = amount-1;
+
+    for (let i = 0; i < amount; i++){
         [state, center] = getNextGeneration(state, conditions, center);
         //if state is the same as last state (even if just shifted), then all future states will be the same too, with an offset
         if (trimState(state).join('') === lastTrimmed){
@@ -34,10 +32,8 @@ const second = (input) => {
         lastTrimmed = trimState(state).join('');
     }
     
-    let addition = 50000000000-stopPoint-1; //get the offset here
-    let totalPlants = getTotal(state, center, addition);
-    
-    console.log('Second Star: ', totalPlants);
+    let addition = amount-stopPoint-1; //get the offset here
+    return getTotal(state, center, addition);
 };
 
 const getTotal = (state, center, addition = 0) => {
