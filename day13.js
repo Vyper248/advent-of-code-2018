@@ -5,7 +5,6 @@ const runFunctions = (input) => {
     second(input);
 }
 
-//Tried: 114,138
 const first = (input) => {   
     let [carts, grid] = getCartsAndGrid(input);
 
