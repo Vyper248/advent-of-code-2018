@@ -8,7 +8,6 @@ const runFunctions = (input) => {
 const first = (input) => {   
     let [grid, units] = getGridAndUnits(input);
     
-       
     let moveToMake = true;
     let iterations = 0;
     while (moveToMake && iterations < 100) {
@@ -16,12 +15,9 @@ const first = (input) => {
         if (moveToMake) iterations++;
     }
     
-    let remainingHP = units.reduce((a,c) => {
-        if (c.hp > 0) a += c.hp;
-        return a;
-    }, 0);
+    let remainingHP = getRemainingHP(units);
     
-    console.log('First Star: ', (iterations-1) * remainingHP);
+    console.log('First Star: ', iterations * remainingHP);
 };
 
 const second = (input) => {
@@ -31,18 +27,16 @@ const second = (input) => {
     let moveToMake = true;
     let elfDied = true;
     let iterations = 0;
-    let powerTried = 4;//25 is correct - takes about 90 seconds
+    let powerTried = 4;//25 is correct
     while (elfDied === true && powerTried < 50) {
         [grid, units] = getGridAndUnits(input, powerTried);
-        console.log('Trying power: ', powerTried);
+        // console.log('Trying power: ', powerTried);
         
         iterations = 0;
         moveToMake = true;
 
         while (moveToMake) {
-            console.time('iteration');
             [units, moveToMake] = iteration(units, grid);
-            console.timeEnd('iteration');
             if (moveToMake) iterations++;
             if (!checkElves(units, elfNumber)) break;
         }
@@ -51,12 +45,16 @@ const second = (input) => {
         else powerTried++;
     }
     
-    let remainingHP = units.reduce((a,c) => {
+    let remainingHP = getRemainingHP(units);
+    
+    console.log('Second Star: ', (iterations-1) * remainingHP);
+};
+
+const getRemainingHP = (units) => {
+    return units.reduce((a,c) => {
         if (c.hp > 0) a += c.hp;
         return a;
     }, 0);
-    
-    console.log('Second Star: ', (iterations-1) * remainingHP);
 };
 
 const checkElves = (units, elfNumber) => {
@@ -77,10 +75,10 @@ const iteration = (units, grid) => {
 
 const attackOrMove = (grid, obj, units) => {
     if (obj.hp <= 0) return false;
-    // console.log('Unit turn: ', obj);
+
     let enemies;
     if (obj.type === 'E') enemies = units.filter(obj => obj.type === 'G' && obj.hp > 0); 
-    if (obj.type === 'G') enemies = units.filter(obj => obj.type === 'E' && obj.hp > 0); 
+    else if (obj.type === 'G') enemies = units.filter(obj => obj.type === 'E' && obj.hp > 0); 
     
     if (enemies.length === 0) return false;
         
@@ -88,7 +86,7 @@ const attackOrMove = (grid, obj, units) => {
     let attacked = attackAdjacent(enemies, obj);
     if (attacked) return true;
     
-    //otherwise find an enemy and move to position if possible
+    //otherwise find an enemy and move to position if possible (also attack after moving if possible)
     let moved = moveUnit(grid, enemies, obj, units);
     if (moved) return true;
     
@@ -101,29 +99,16 @@ const moveUnit = (grid, enemies, obj, units) => {
     enemies.forEach(enemy => targetPositions.push(...getAdjacent(grid, enemy, units)));
     
     targetPositions = sortArr(targetPositions);
-    
-    // console.log('Target Positions: ', targetPositions);
-    
-    let closestDistance = Infinity;
-    let positionToMove;
-    targetPositions.forEach(target => {
-        let [distance, position] = pathfind(grid, units, obj, target);
-        // console.log('Distance to ', target, ' is ', distance);
-        if (distance !== undefined && distance < closestDistance){
-            closestDistance = distance;
-            positionToMove = position;
-        }
-    });
+        
+    let positionToMove = pathfind(grid, units, obj, targetPositions);
     
     if (positionToMove !== undefined){
         obj.x = positionToMove.x;
         obj.y = positionToMove.y;
-        // console.log('Moving to: ', positionToMove.x, positionToMove.y);
         //after moving, try attacking again
         attackAdjacent(enemies, obj);
         return true;
     } else {
-        // console.log("Can't do anything");
         return false;
     }
 };
@@ -136,7 +121,7 @@ const attackAdjacent = (enemies, obj) => {
         if (enemy.x === obj.x && enemy.y === obj.y-1) adjacentEnemies.push(enemy);
         if (enemy.x === obj.x && enemy.y === obj.y+1) adjacentEnemies.push(enemy);
     });
-    // console.log("Adjacent Enemies: ", adjacentEnemies);
+    
     //if there's adjacent enemies, pick one to attack
     if (adjacentEnemies.length > 0){
         if (adjacentEnemies.length > 1) adjacentEnemies = adjacentEnemies.sort((a,b) => {
@@ -146,15 +131,13 @@ const attackAdjacent = (enemies, obj) => {
         });
         let toAttack = adjacentEnemies[0];
         toAttack.hp -= obj.ap;
-        // console.log('Unit Attacked ', toAttack, obj.ap);
         return true;
     }
     return false;
 }
 
 //find closest path and return distance and first position to move to
-const pathfind = (grid, units, objA, target) => {
-    objA.score = 0;
+const pathfind = (grid, units, objA, targets) => {
     let nodes = [objA]; //nodes to check next
     let checked = []; //nodes already checked
     let path = [];
@@ -166,8 +149,7 @@ const pathfind = (grid, units, objA, target) => {
         let adjacentArr = getAdjacent(grid, node, units, others);
         for (adjacentNode of adjacentArr) {
             adjacentNode.prev = node;
-            adjacentNode.score = node.score+1;
-            if (adjacentNode.x == target.x && adjacentNode.y === target.y) { //found path
+            if (checkTargets(adjacentNode.x, adjacentNode.y, targets)) { //found path
                 let current = adjacentNode;
                 while (current !== undefined) {
                     if (current !== objA) path.push(current);
@@ -178,16 +160,20 @@ const pathfind = (grid, units, objA, target) => {
             } else {
                 nodes.push(adjacentNode);
             }
-        };
+        }
     }
     
     if (path.length > 0){
-        let distance = path[0].score;
         let first = path[path.length-1];
-        return [distance, first];
+        return first;
     } else {
-        return [undefined, undefined];
+        return undefined;
     }
+}
+
+const checkTargets = (x,y,targets) => {
+    if (targets.find(target => target.x === x && target.y === y)) return true;
+    return false;
 }
 
 const getAdjacent = (grid, obj, units, other=[]) => {
@@ -205,10 +191,6 @@ const checkPos = (x, y, grid, units, other=[]) => {
     if (units.find(obj => obj.x === x && obj.y === y && obj.hp > 0) !== undefined) return false;
     if (other.find(obj => obj.x === x && obj.y === y) !== undefined) return false;
     return true;
-}
-
-const distance = (objA, objB) => {
-    return Math.abs(objA.x-objB.x) + Math.abs(objA.y-objB.y);
 }
 
 //sort an array ob objects with x/y positions from top-bottom left-right
