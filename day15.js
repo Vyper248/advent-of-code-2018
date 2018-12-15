@@ -31,14 +31,18 @@ const second = (input) => {
     let moveToMake = true;
     let elfDied = true;
     let iterations = 0;
-    let powerTried = 4;//25 is correct
+    let powerTried = 4;//25 is correct - takes about 90 seconds
     while (elfDied === true && powerTried < 50) {
         [grid, units] = getGridAndUnits(input, powerTried);
-        // console.log('Trying power: ', powerTried);
+        console.log('Trying power: ', powerTried);
+        
         iterations = 0;
         moveToMake = true;
+
         while (moveToMake) {
+            console.time('iteration');
             [units, moveToMake] = iteration(units, grid);
+            console.timeEnd('iteration');
             if (moveToMake) iterations++;
             if (!checkElves(units, elfNumber)) break;
         }
