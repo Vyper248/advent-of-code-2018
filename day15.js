@@ -1,40 +1,8 @@
 const readFile = require('./readFile').readFile;
 
 const runFunctions = (input) => {
-//     input = `#######
-// #.G...#
-// #...EG#
-// #.#.#G#
-// #..G#E#
-// #.....#
-// #######`;
-// 
-//     input = `#######
-// #G..#E#
-// #E#E.E#
-// #G.##.#
-// #...#E#
-// #...E.#
-// #######`;
-// 
-//     input = `#######
-// #E..EG#
-// #.#G.E#
-// #E.##E#
-// #G..#.#
-// #..E#.#
-// #######`;
-// 
-//     input = `#######
-// #E.G#.#
-// #.#G..#
-// #G.#.G#
-// #G..#.#
-// #...E.#
-// #######`;
-
     first(input);
-    // second(input);
+    second(input);
 }
 
 const first = (input) => {   
@@ -44,7 +12,6 @@ const first = (input) => {
     let moveToMake = true;
     let iterations = 0;
     while (moveToMake && iterations < 100) {
-        // displayGrid(grid, units); 
         [units, moveToMake] = iteration(units, grid);
         if (moveToMake) iterations++;
     }
@@ -57,7 +24,6 @@ const first = (input) => {
     console.log('First Star: ', (iterations-1) * remainingHP);
 };
 
-//Tried 52632 too high
 const second = (input) => {
     let [grid, units] = getGridAndUnits(input, 4);
     let elfNumber = units.filter(unit => unit.type === 'E').length;
@@ -65,14 +31,13 @@ const second = (input) => {
     let moveToMake = true;
     let elfDied = true;
     let iterations = 0;
-    let powerTried = 4;
+    let powerTried = 4;//25 is correct
     while (elfDied === true && powerTried < 50) {
         [grid, units] = getGridAndUnits(input, powerTried);
-        console.log('Trying power: ', powerTried);
+        // console.log('Trying power: ', powerTried);
         iterations = 0;
         moveToMake = true;
         while (moveToMake) {
-            // displayGrid(grid, units); 
             [units, moveToMake] = iteration(units, grid);
             if (moveToMake) iterations++;
             if (!checkElves(units, elfNumber)) break;
@@ -87,7 +52,7 @@ const second = (input) => {
         return a;
     }, 0);
     
-    console.log('Second Star: ', (iterations-1) * remainingHP, iterations, remainingHP);
+    console.log('Second Star: ', (iterations-1) * remainingHP);
 };
 
 const checkElves = (units, elfNumber) => {
@@ -95,22 +60,11 @@ const checkElves = (units, elfNumber) => {
     return true;
 };
 
-const displayGrid = (grid, units) => {
-    let display = grid.map((line,y) => {
-        return line.map((pos,x) => {
-            let unit = units.find(unit => unit.x === x && unit.y === y);
-            if (unit) return unit.type;
-            return pos;
-        }).join('');
-    });
-    console.log(display);
-}
-
 const iteration = (units, grid) => {
     let moveToMake = false;
     units.forEach(unit => {
-        let [canAttack, canMove] = attackOrMove(grid, unit, units);
-        if (canMove || canAttack) moveToMake = true;
+        let didSomething = attackOrMove(grid, unit, units);
+        if (didSomething) moveToMake = true;
     });
     units = units.filter(unit => unit.hp > 0);
     units = sortArr(units);
@@ -118,27 +72,23 @@ const iteration = (units, grid) => {
 };
 
 const attackOrMove = (grid, obj, units) => {
-    if (obj.hp <= 0) return [false, false];
+    if (obj.hp <= 0) return false;
     // console.log('Unit turn: ', obj);
     let enemies;
     if (obj.type === 'E') enemies = units.filter(obj => obj.type === 'G' && obj.hp > 0); 
     if (obj.type === 'G') enemies = units.filter(obj => obj.type === 'E' && obj.hp > 0); 
     
-    if (enemies.length === 0) return [false, false];
-    
-    let attacked = false;
-    let moved = false;
-    let attackActions = [];
-    
+    if (enemies.length === 0) return false;
+        
     //attack adjacent if there are any
-    attacked = attackAdjacent(enemies, obj, attackActions);
-    if (attacked) return [attacked, moved];
+    let attacked = attackAdjacent(enemies, obj);
+    if (attacked) return true;
     
     //otherwise find an enemy and move to position if possible
-    [moved, attacked] = moveUnit(grid, enemies, obj, units);
-    if (moved) return [attacked, moved];
+    let moved = moveUnit(grid, enemies, obj, units);
+    if (moved) return true;
     
-    return [attacked, moved];
+    return false;
 }
 
 const moveUnit = (grid, enemies, obj, units) => {
@@ -166,15 +116,15 @@ const moveUnit = (grid, enemies, obj, units) => {
         obj.y = positionToMove.y;
         // console.log('Moving to: ', positionToMove.x, positionToMove.y);
         //after moving, try attacking again
-        let attacked = attackAdjacent(enemies, obj);
-        return [true, attacked];
+        attackAdjacent(enemies, obj);
+        return true;
     } else {
         // console.log("Can't do anything");
-        return [false, false];
+        return false;
     }
 };
 
-const attackAdjacent = (enemies, obj, attackActions=[]) => {
+const attackAdjacent = (enemies, obj) => {
     let adjacentEnemies = [];
     enemies.forEach(enemy => {
         if (enemy.x === obj.x+1 && enemy.y === obj.y) adjacentEnemies.push(enemy);
@@ -192,7 +142,6 @@ const attackAdjacent = (enemies, obj, attackActions=[]) => {
         });
         let toAttack = adjacentEnemies[0];
         toAttack.hp -= obj.ap;
-        attackActions.push({obj: toAttack, hpTaken: obj.ap});
         // console.log('Unit Attacked ', toAttack, obj.ap);
         return true;
     }
