@@ -113,34 +113,19 @@ const evalCode = (code, regs, instr) => {
 };
 
 const getArrays = (input) => {
-    let arr = input.split('\n');
+    let arr = input.split('\n\n\n\n');
     
-    let newSet = true;
-    let second = false;
-    let currentObj = {};
-    let tests = [];
-    let instructions = [];
-    arr.forEach(line => {
-        if (newSet && line.length === 0) second = true;
-        if (second && line.length > 0) {
-            instructions.push(line.split(' ').map(Number));
-            return;
-        }
-        
-        if (newSet && line.length > 0) {
-            currentObj = {before:[], after:[], instr:[]};
-            tests.push(currentObj);
-        }
-        
-        if (line.includes('Before')) currentObj.before = line.match(/\[([0-9, ]+)\]/)[1];
-        else if (line.includes('After')) currentObj.after = line.match(/\[([0-9, ]+)\]/)[1];
-        else if (line.length > 0) currentObj.instr = line.split(' ').map(Number);
-        else {
-            newSet = true;
-            return;
-        }
-        newSet = false;
+    let tests = arr[0].split('\n\n').map(lines => {
+        let obj = {};
+        let array = lines.split('\n');
+        array.forEach(line => {
+            if (line.includes('Before')) obj.before = line.match(/\[([0-9, ]+)\]/)[1];
+            else if (line.includes('After')) obj.after = line.match(/\[([0-9, ]+)\]/)[1];
+            else if (line.length > 0) obj.instr = line.split(' ').map(Number);
+        });        
+        return obj;
     });
+    let instructions = arr[1].split('\n').map(numbers => numbers.split(' ').map(Number));
 
     return [tests, instructions];
 };
