@@ -148,7 +148,7 @@ const getGrid = (input) => {
         } else {
             const y = Number(parts[0].replace('y=', ''));
             const [from, to] = parts[1].replace(/[x|y]=/, '').split('..').map(Number);
-            [lowX, highX, lowY, highY] = compareValues(y, lowY, highY, from, to, lowX, highX);
+            [lowY, highY, lowX, highX] = compareValues(y, lowY, highY, from, to, lowX, highX);
             yLines.push({y, from, to});
         }
     });
