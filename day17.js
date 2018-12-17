@@ -11,10 +11,10 @@ const first = (input) => {
     
     // display(grid, lowX, highX, 0);
     
-    let water = countWater(grid, lowX, highX, lowY, highY);
+    let water = countStr(grid, lowX, highX, lowY, highY, '~', '|');
     console.log('First Star: ', water);
     
-    let left = retained(grid, lowX, highX, lowY, highY);
+    let left = countStr(grid, lowX, highX, lowY, highY, '~');
     console.log('Second Star: ', left);
 };
 
@@ -30,24 +30,15 @@ const display = (grid, lowX, highX) => {
     }
 };
 
-const countWater = (grid, lowX, highX, lowY, highY) => {
-    let water = 0;
+const countStr = (grid, lowX, highX, lowY, highY, str1, str2) => {
+    let total = 0;
     for (let x = lowX-5; x <= highX+4; x++){
         for (let y = lowY; y <= highY; y++){
-            if (grid[x][y] === '~' || grid[x][y] === '|') water++;
+            if (grid[x][y] === str1) total++;
+            else if (str2 && grid[x][y] === str2) total++;
         }
     }
-    return water;
-};
-
-const retained = (grid, lowX, highX, lowY, highY) => {
-    let water = 0;
-    for (let x = lowX-5; x <= highX+4; x++){
-        for (let y = lowY; y <= highY; y++){
-            if (grid[x][y] === '~') water++;
-        }
-    }
-    return water;
+    return total;
 }
 
 const flow = (grid, lowX, highX, highY, x, y) => {
