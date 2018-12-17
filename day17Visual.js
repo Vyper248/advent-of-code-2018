@@ -1,90 +1,71 @@
+const SPEED = 30;
+let LOWX, HIGHX;
+
 const runFunctions = (input) => {
     first(input);
 }
 
 const first = (input) => {   
     const [grid, lowX, highX, lowY, highY] = getGrid(input);
-        
+    LOWX = lowX;
+    HIGHX = highX;
+    
     flow(grid, lowX, highX, highY, 500, 0);
-    
-    // display(grid, lowX, highX, 0);
-    let y = 0;
-    let timer = setInterval(()=>{
-        if (y <= highY){
-            updateHtmlGrid(grid, lowX, highX, y);
-            y++;
-        } else {
-            clearInterval(timer);
-        }
-    },60);
-    
-    let water = countStr(grid, lowX, highX, lowY, highY, '~', '|');
-    console.log('First Star: ', water);
-    
-    let left = countStr(grid, lowX, highX, lowY, highY, '~');
-    console.log('Second Star: ', left);
 };
-
-//can display all with 'node day17.js | less' - use enter to go down and q to exit
-const display = (grid, lowX, highX) => {
-    let max = grid[lowX].length;
-    for (let y = 0; y < max; y++){
-        let str = '';
-        for (let x = lowX-1; x < highX+2; x++){
-            str += grid[x][y];
-        }
-        console.log(str);
-    }
-};
-
-const countStr = (grid, lowX, highX, lowY, highY, str1, str2) => {
-    let total = 0;
-    for (let x = lowX-5; x <= highX+4; x++){
-        for (let y = lowY; y <= highY; y++){
-            if (grid[x][y] === str1) total++;
-            else if (str2 && grid[x][y] === str2) total++;
-        }
-    }
-    return total;
-}
 
 const flow = (grid, lowX, highX, highY, x, y) => {
     let bottom = findClay(grid, x, y, highY);
-    //put this into promise first
-    fall(grid, x, y, bottom);//let water fall down to bottom position
-    
-    if (grid[x][bottom+1] === '|') return; //if hitting water, then fall to it and stop (will merge with it) 
-    if (bottom === highY) return; //if hitting bottom of grid, stop
-    
-    //then do this as a promise, with each fillWith being a setTimeout
-    //while within a contained area, fill with water, otherwise get positions to spread to
-    let spreadFrom, spreadTo;
-    while (true){
-        [canFill, from, to] = checkContained(lowX, highX, grid, x, bottom);
-        if (canFill){
-            fillWith(grid, bottom, from, to, '~');
-            bottom--;
-        } else {
-            spreadFrom = from;
-            spreadTo = to;
-            break;
-        }
-    }
-    
-    //then do this as a promise
-    //spread water
-    fillWith(grid, bottom, spreadFrom, spreadTo, '|');
-    
-    //then start these 2 functions to repeat the loop
-    //using end positions of spread, begin flow again
-    if (grid[spreadFrom][bottom+1] === '.') flow(grid, lowX, highX, highY, spreadFrom, bottom);
-    if (grid[spreadTo][bottom+1] === '.') flow(grid, lowX, highX, highY, spreadTo, bottom);
+
+    fall(grid, x, y, bottom).then(()=>{//let water fall down to bottom position
+        if (grid[x][bottom+1] === '|') return; //if hitting water, then fall to it and stop (will merge with it) 
+        if (bottom === highY) return; //if hitting bottom of grid, stop
+        
+        fillArea(grid, bottom, x).then(({spreadFrom, spreadTo, bottom})=>{
+            //spread water
+            fillWith(grid, bottom, spreadFrom, spreadTo, '|');
+            updateHtmlGrid(grid, bottom);
+            
+            //using end positions of spread, begin flow again
+            if (grid[spreadFrom][bottom+1] === '.') flow(grid, lowX, highX, highY, spreadFrom, bottom);
+            if (grid[spreadTo][bottom+1] === '.') flow(grid, lowX, highX, highY, spreadTo, bottom);
+        });
+    });
 };
 
+const fillArea = (grid, bottom, x) => {
+    return new Promise((resolve, reject) => {
+        //while within a contained area, fill with water, otherwise get positions to spread to
+        let spreadFrom, spreadTo;
+        let timer = setInterval(()=>{
+            let [canFill, from, to] = checkContained(LOWX, HIGHX, grid, x, bottom);
+            if (canFill){
+                fillWith(grid, bottom, from, to, '~');
+                updateHtmlGrid(grid, bottom);
+                bottom--;
+            } else {
+                spreadFrom = from;
+                spreadTo = to;
+                clearInterval(timer);
+                resolve({spreadFrom, spreadTo, bottom});
+            }
+        }, SPEED);
+    });
+}
+
 const fall = (grid, x, from, to) => {
-    for (let y = from; y <= to; y++){
-        grid[x][y] = '|';
-    }
+    return new Promise((resolve, reject) => {
+        let y = from;
+        let timer = setInterval(()=>{
+            if (y <= to){
+                grid[x][y] = '|';
+                updateHtmlGrid(grid, y);
+                y++;
+            } else {
+                clearInterval(timer);
+                resolve();
+            }
+        }, SPEED);
+    });
 };
 
 const fillWith = (grid, y, from, to, str) => {
@@ -190,7 +171,6 @@ const getGrid = (input) => {
         }
     });
     
-    console.log(lowX, highX);
     createHtmlGrid(grid, lowX, highX);
     
     return [grid, lowX, highX, lowY, highY];
@@ -212,15 +192,16 @@ const createHtmlGrid = (grid, lowX, highX) => {
         newDiv.innerHTML = str;
         newDiv.style.position = 'absolute';
         newDiv.style.left = '0px';
-        newDiv.style.top = (y*10)+'px';
+        newDiv.style.top = (y*6)+'px';
         newDiv.setAttribute('id', 'row'+y);
+        newDiv.classList.add('row');
         displayGrid.appendChild(newDiv);
     }    
 }
 
-const updateHtmlGrid = (grid, lowX, highX, y) => {
+const updateHtmlGrid = (grid, y) => {
     let str = '';
-    for (let x = lowX-1; x < highX+2; x++){
+    for (let x = LOWX-1; x < HIGHX+2; x++){
         if (grid[x][y] === '~' || grid[x][y] === '|') str += '<span class="water">&nbsp;</span>';
         else if (grid[x][y] === '#') str += '<span class="clay">&nbsp;</span>';
         else str += '&nbsp;';

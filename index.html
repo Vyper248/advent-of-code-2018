@@ -4,12 +4,9 @@
         <meta charset="utf-8">
         <title></title>
         <link href="https://fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet">
+        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.1/css/all.css" integrity="sha384-gfdkjb5BdAXd+lj+gudLWI+BXq4IuLW5IT+brZEZsLFm++aCMlF1V92rMkPaX4PP" crossorigin="anonymous">
         <link type="text/css" rel="stylesheet" href="style.css">
-        <style>
-            
-
-        
-        </style>
+        <style></style>
     </head>
     <body>
         <h1><a href="https://adventofcode.com/2018">Advent of Code 2018</a></h1>
@@ -23,6 +20,7 @@
         <template>
             <div class="day">
                 <h3>Day 1</h3>
+                <div class="visualLink"><a target="_blank"></a></div>
                 
                 <div class="answers">
                     <div class="starGroup">
@@ -65,7 +63,7 @@
                 {first: 3811491411, second: 20408083},
                 {first: 189000, second: 38512},
                 {first: 646, second: 681},
-                {first: 30635, second: 25094},
+                {first: 30635, second: 25094, visual:'day17Visual.html'},
                 {first: 0, second: 0},
                 {first: 0, second: 0},
                 {first: 0, second: 0},
@@ -93,6 +91,12 @@
                 if (day.first === 0 && day.second === 0){
                     dayNode.querySelector('.day').classList.add('empty');
                     dayNode.querySelector('.link').removeAttribute('href');
+                }
+                
+                if (day.visual && day.visual.length > 0){
+                    let link = dayNode.querySelector('.visualLink a');
+                    link.setAttribute('href', day.visual);
+                    link.innerHTML = '<i class="fas fa-eye"></i>';
                 }
                 
                 container.appendChild(dayNode);
