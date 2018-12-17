@@ -186,13 +186,9 @@ const createHtmlGrid = (grid, lowX, highX) => {
             else if (grid[x][y] === '#') str += '<span class="clay">&nbsp;</span>';
             else str += '&nbsp;';
         }
-        // console.log(str);
         
         let newDiv = document.createElement('div');
         newDiv.innerHTML = str;
-        newDiv.style.position = 'absolute';
-        newDiv.style.left = '0px';
-        newDiv.style.top = (y*6)+'px';
         newDiv.setAttribute('id', 'row'+y);
         newDiv.classList.add('row');
         displayGrid.appendChild(newDiv);
