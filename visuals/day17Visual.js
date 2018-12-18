@@ -214,6 +214,6 @@ const compareValues = (a, lowA, highA, from, to, lowB, highB) => {
     return [lowA, highA, lowB, highB];
 }
 
-fetch('day17Input.txt').then(resp => resp.text()).then(data => {
+fetch('../day17Input.txt').then(resp => resp.text()).then(data => {
     runFunctions(data);
 });
