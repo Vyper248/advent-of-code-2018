@@ -6,7 +6,7 @@ const both = (input) => {
 };
 
 const pathfind = (points, start) => {
-    let first = {pos: start, prev: null, score: 0};
+    let first = {pos: start, score: 0};
     let nodes = [first]; //nodes to check next
     let checked = new Set(); //nodes already checked
     let highestScore = 0;
@@ -17,7 +17,6 @@ const pathfind = (points, start) => {
         checked.add(node.pos);
         let adjacentArr = getAdjacent(points, node, checked);
         for (adjacentNode of adjacentArr) {
-            adjacentNode.prev = node;
             adjacentNode.score = node.score+1;
             if (adjacentNode.score >= 1000) over1000++;
             if (adjacentNode.score > highestScore) highestScore++;
