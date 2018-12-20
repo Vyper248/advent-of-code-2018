@@ -8,13 +8,13 @@ const both = (input) => {
 const pathfind = (points, start) => {
     let first = {pos: start, prev: null, score: 0};
     let nodes = [first]; //nodes to check next
-    let checked = []; //nodes already checked
+    let checked = new Set(); //nodes already checked
     let highestScore = 0;
     let over1000 = 0;
     
     while (nodes.length > 0) {
         let node = nodes.shift();
-        checked.push(node.pos);
+        checked.add(node.pos);
         let adjacentArr = getAdjacent(points, node, checked);
         for (adjacentNode of adjacentArr) {
             adjacentNode.prev = node;
@@ -44,13 +44,13 @@ const checkValid = (arr1, arr2, point, axis, amnt) => {
     pos[axis] += amnt;
     let pos2 = arr(point);
     pos2[axis] += amnt*2;
-    return arr1.includes(str(pos)) && !arr2.includes(str(pos2)) ? [{pos: str(pos2)}] : [];
+    return arr1.has(str(pos)) && !arr2.has(str(pos2)) ? [{pos: str(pos2)}] : [];
 };
 
 //don't need to build a grid of walls, just need an array of valid points for pathfinding
 const getValidPoints = (input) => {
     input = input.replace(/(\^|\$)/g, '');
-    let validPoints = [];
+    let validPoints = new Set();
     let pos = [0,0];
     let startPoints = [str(pos)];
     
@@ -80,9 +80,9 @@ const arr = (pos) => {
 //for each direction, move 2 spaces, 1 for the door and one for the room
 const move = (pos, validPoints, axis, dir) => {
     pos[axis] += dir;
-    validPoints.push(str(pos));
+    validPoints.add(str(pos));
     pos[axis] += dir;
-    validPoints.push(str(pos));
+    validPoints.add(str(pos));
 }
 
 readFile('day20Input.txt', both);
