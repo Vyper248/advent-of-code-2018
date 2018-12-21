@@ -120,16 +120,9 @@ a.link {
     display: inline-block;
 }
 
-.link:hover {
-    border-right-color: black;
-    border-left-color: black;
-    border-bottom-color: black;
-    background-color: black;
-    color: var(--textColor);
-}
-
 .link.inverted:hover {
     border-color: lightgray;
+    color: var(--textColor);
 }
 
 .day.empty .link:hover {
@@ -156,5 +149,13 @@ a.link {
 }
 
 .visualLink a {
+    color: var(--textColor);
+}
+
+.day a.link:hover {
+    border-right-color: black;
+    border-left-color: black;
+    border-bottom-color: black;
+    background-color: black;
     color: var(--textColor);
 }

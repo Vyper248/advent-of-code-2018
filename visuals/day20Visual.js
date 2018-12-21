@@ -1,11 +1,11 @@
 let lowX = 0;
 let lowY = 0;
-let points = document.querySelector('#points');
 let divs = [];
 let c = document.getElementById("myCanvas");
 let ctx = c.getContext("2d");
 ctx.fillStyle = "#000000";
 const SIZE = 5;
+const SPEED_MULT = 3;
 
 const both = (input) => {
     let points = getValidPoints(input);
@@ -23,25 +23,27 @@ const pathfind = (points, start) => {
     getLowPoints(points);
     
     let timer = setInterval(()=>{
-        if (nodes.length === 0){
-            clearInterval(timer);
-            showPathBack(furthestNode);
-            return;
-        }
-        
-        let node = nodes.shift();
-        checked.add(node.pos);
-        let adjacentArr = getAdjacent(points, node, checked);
-        for (adjacentNode of adjacentArr) {
-            adjacentNode.score = node.score+1;
-            adjacentNode.prev = node;
-            if (adjacentNode.score >= 1000) over1000++;
-            if (adjacentNode.score > highestScore) {
-                highestScore++;
-                furthestNode = adjacentNode;
+        for (let i = 0; i < SPEED_MULT; i++){
+            if (nodes.length === 0){
+                clearInterval(timer);
+                showPathBack(furthestNode);
+                return;
             }
-            nodes.push(adjacentNode);
-            addPoint(adjacentNode.pos);
+
+            let node = nodes.shift();
+            checked.add(node.pos);
+            let adjacentArr = getAdjacent(points, node, checked);
+            for (adjacentNode of adjacentArr) {
+                adjacentNode.score = node.score+1;
+                adjacentNode.prev = node;
+                if (adjacentNode.score >= 1000) over1000++;
+                if (adjacentNode.score > highestScore) {
+                    highestScore++;
+                    furthestNode = adjacentNode;
+                }
+                nodes.push(adjacentNode);
+                addPoint(adjacentNode.pos);
+            }
         }
     });
 }
@@ -55,16 +57,18 @@ const showPathBack = (furthestNode) => {
     ctx.fillStyle = "#FF0000";
     
     let timer2 = setInterval(() => {
-        if (furthestNode.prev === null){
-            clearInterval(timer2);
-            //show start point
-            ctx.fillStyle = "#00FF00";
+        for (let i = 0; i < SPEED_MULT; i++){
+            if (furthestNode.prev === null){
+                clearInterval(timer2);
+                //show start point
+                ctx.fillStyle = "#00FF00";
+                addPoint(furthestNode.pos);
+                return;
+            }
+
             addPoint(furthestNode.pos);
-            return;
+            furthestNode = furthestNode.prev;
         }
-        
-        addPoint(furthestNode.pos);
-        furthestNode = furthestNode.prev;
     });
 };
 

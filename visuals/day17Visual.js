@@ -1,5 +1,11 @@
 const SPEED = 30;
+const SPEED_MULT = 2;
 let LOWX, HIGHX;
+const SIZE = 5;
+let startPoint = 500;
+let c = document.getElementById("myCanvas");
+let ctx = c.getContext("2d");
+ctx.fillStyle = "#000000";
 
 const runFunctions = (input) => {
     first(input);
@@ -7,13 +13,14 @@ const runFunctions = (input) => {
 
 const first = (input) => {   
     const [grid, lowX, highX, lowY, highY] = getGrid(input);
-    LOWX = lowX;
-    HIGHX = highX;
     
-    flow(grid, lowX, highX, highY, 500, 0);
+    
+    flow(grid, lowX, highX, highY, startPoint, 0);
 };
 
 const flow = (grid, lowX, highX, highY, x, y) => {
+    if (x > highX || x < lowX) return;
+    
     let bottom = findClay(grid, x, y, highY);
 
     fall(grid, x, y, bottom).then(()=>{//let water fall down to bottom position
@@ -23,7 +30,6 @@ const flow = (grid, lowX, highX, highY, x, y) => {
         fillArea(grid, bottom, x).then(({spreadFrom, spreadTo, bottom})=>{
             //spread water
             fillWith(grid, bottom, spreadFrom, spreadTo, '|');
-            updateHtmlGrid(grid, bottom);
             
             //using end positions of spread, begin flow again
             if (grid[spreadFrom][bottom+1] === '.') flow(grid, lowX, highX, highY, spreadFrom, bottom);
@@ -37,16 +43,17 @@ const fillArea = (grid, bottom, x) => {
         //while within a contained area, fill with water, otherwise get positions to spread to
         let spreadFrom, spreadTo;
         let timer = setInterval(()=>{
-            let [canFill, from, to] = checkContained(LOWX, HIGHX, grid, x, bottom);
-            if (canFill){
-                fillWith(grid, bottom, from, to, '~');
-                updateHtmlGrid(grid, bottom);
-                bottom--;
-            } else {
-                spreadFrom = from;
-                spreadTo = to;
-                clearInterval(timer);
-                resolve({spreadFrom, spreadTo, bottom});
+            for (let i = 0; i < SPEED_MULT; i++){
+                let [canFill, from, to] = checkContained(LOWX, HIGHX, grid, x, bottom);
+                if (canFill){
+                    fillWith(grid, bottom, from, to, '~');
+                    bottom--;
+                } else {
+                    spreadFrom = from;
+                    spreadTo = to;
+                    clearInterval(timer);
+                    resolve({spreadFrom, spreadTo, bottom});
+                }
             }
         }, SPEED);
     });
@@ -56,13 +63,15 @@ const fall = (grid, x, from, to) => {
     return new Promise((resolve, reject) => {
         let y = from;
         let timer = setInterval(()=>{
-            if (y <= to){
-                grid[x][y] = '|';
-                updateHtmlGrid(grid, y);
-                y++;
-            } else {
-                clearInterval(timer);
-                resolve();
+            for (let i = 0; i < SPEED_MULT; i++){
+                if (y <= to){
+                    grid[x][y] = '|';
+                    ctx.fillRect((x-LOWX)*SIZE,y*SIZE,SIZE,SIZE);
+                    y++;
+                } else {
+                    clearInterval(timer);
+                    resolve();
+                }
             }
         }, SPEED);
     });
@@ -71,6 +80,7 @@ const fall = (grid, x, from, to) => {
 const fillWith = (grid, y, from, to, str) => {
     for (let x = from; x <= to; x++){
         grid[x][y] = str;
+        ctx.fillRect((x-LOWX)*SIZE,y*SIZE,SIZE,SIZE);
     }
 };
 
@@ -171,39 +181,27 @@ const getGrid = (input) => {
         }
     });
     
-    createHtmlGrid(grid, lowX, highX);
+    LOWX = lowX;
+    HIGHX = highX;
+    
+    createHtmlGrid(grid, lowX, highX, lowY, highY);
     
     return [grid, lowX, highX, lowY, highY];
 };
 
-const createHtmlGrid = (grid, lowX, highX) => {
+const createHtmlGrid = (grid, lowX, highX, lowY, highY) => {
     let max = grid[lowX].length;
-    let displayGrid = document.querySelector('.grid');
+    c.width = (highX-lowX+1)*SIZE;
+    c.height = (highY+1)*SIZE;
+    ctx.fillStyle = "#555555";
+    
     for (let y = 0; y < max; y++){
-        let str = '';
         for (let x = lowX-1; x < highX+2; x++){
-            if (grid[x][y] === '~' || grid[x][y] === '|') str += '<span class="water">&nbsp;</span>';
-            else if (grid[x][y] === '#') str += '<span class="clay">&nbsp;</span>';
-            else str += '&nbsp;';
+            if (grid[x][y] === '#') ctx.fillRect((x-LOWX)*SIZE,y*SIZE,SIZE,SIZE);
         }
-        
-        let newDiv = document.createElement('div');
-        newDiv.innerHTML = str;
-        newDiv.setAttribute('id', 'row'+y);
-        newDiv.classList.add('row');
-        displayGrid.appendChild(newDiv);
-    }    
-}
-
-const updateHtmlGrid = (grid, y) => {
-    let str = '';
-    for (let x = LOWX-1; x < HIGHX+2; x++){
-        if (grid[x][y] === '~' || grid[x][y] === '|') str += '<span class="water">&nbsp;</span>';
-        else if (grid[x][y] === '#') str += '<span class="clay">&nbsp;</span>';
-        else str += '&nbsp;';
-    }
-    let div = document.querySelector('#row'+y);
-    div.innerHTML = str;
+    } 
+    
+    ctx.fillStyle = "#aaeaff";
 }
 
 const compareValues = (a, lowA, highA, from, to, lowB, highB) => {
@@ -214,6 +212,18 @@ const compareValues = (a, lowA, highA, from, to, lowB, highB) => {
     return [lowA, highA, lowB, highB];
 }
 
+document.querySelector('body').addEventListener('click', (e)=>{
+    let gridWidth = parseInt(window.getComputedStyle(c).width);
+    let offset = (window.innerWidth - gridWidth)/2;
+    let clickX = e.clientX - offset;
+    let percentage = clickX / gridWidth;
+    let pos = Math.round((percentage*(HIGHX-LOWX))+LOWX);
+    window.location.replace('day17Visual.html?x='+pos);
+});
+
 fetch('../day17Input.txt').then(resp => resp.text()).then(data => {
+    var url = new URL(window.location.href);
+    var x = Number(url.searchParams.get("x"));
+    if (x) startPoint = x;
     runFunctions(data);
 });
