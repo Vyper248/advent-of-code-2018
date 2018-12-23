@@ -76,14 +76,6 @@ const pathfind = (grid, target) => {
     return endNode;
 };
 
-const commonTool = (a, b) => {
-    let common = [];
-    a.forEach(tool => {
-        if (b.includes(tool)) common.push(tool);
-    });
-    return common;
-}
-
 const getTimeAndTool = (grid, from, to, tool, target) => {
     let [x1,y1] = arr(from);
     let [x2,y2] = arr(to);
@@ -97,7 +89,7 @@ const getTimeAndTool = (grid, from, to, tool, target) => {
         '|': ['T', 'N']
     }
         
-    let nextTools = commonTool(allowed[a], allowed[b]);
+    let nextTools = allowed[a].filter(tool => allowed[b].includes(tool));
     if (x2 === tx && y2 === ty){
         if (nextTools.includes(tool) && tool === 'T') return [1, 'T'];
         if (nextTools.includes(tool) && tool !== 'T') return [8, 'T'];
@@ -119,13 +111,6 @@ const getAdjacent = (grid, {pos}) => {
 
 const createNode = (pos) => {
     return {pos, gScore:Infinity, prev: null, tool: ''};
-};
-
-const costEstimate = (pos, target) => {
-    let start = arr(pos);
-    let end = arr(target);
-    let distance = Math.abs(start[0] - end[0]) + Math.abs(start[1] - end[1]);
-    return distance;
 };
 
 const arr = (pos) => {
