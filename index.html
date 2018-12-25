@@ -103,11 +103,11 @@
             });
             
             function checkLength(dayNode, answer, className){
-                if (answer.toString().length > 7) {
+                if (answer.toString().length > 10) {
                     const popup = dayNode.querySelector(`.answer.${className} + .popupAnswer`);
                     popup.innerHTML = answer;
                     popup.classList.remove('hidden');
-                    return answer.toString().substr(0,4) + '...';
+                    return answer.toString().substr(0,5) + '...';
                 }
                 return answer;
             }
