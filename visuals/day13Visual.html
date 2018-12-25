@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+    <head>
+        <meta charset="utf-8">
+        <title></title>
+        
+        <style>            
+            * {
+                box-sizing: border-box;
+            }
+            
+            body, html {
+                min-height: 100%;
+            }
+            
+            body {
+                text-align: center;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                flex-direction: column;
+            }
+            
+            h2 {
+                margin: 0px;
+            }
+            
+            body div {
+                margin: 5px;
+            }
+            
+            canvas {
+                max-width: 100%;
+            }
+            
+            #canvasContainer {
+                position: relative;
+            }
+            
+            #carts {
+                position: absolute;
+                top: 0px;
+                left: 0px;
+            }
+        </style>
+        
+    </head>
+    <body>
+        
+        <div><h2>Visualisation for Advent of Code - Day 13</h2></div>
+        <div id="canvasContainer">
+            <canvas id="track" width="900" height="900"></canvas>
+            <canvas id="carts" width="900" height="900"></canvas>
+        </div>
+        
+        <script src="day13Visual.js"></script>
+    </body>
+</html>
